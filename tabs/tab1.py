@@ -22,10 +22,22 @@ def tab1():
     st.title("MTA Realtime Subway Dashboard")
 
     feed_group = st.selectbox("Feed group", ["A", "B", "N", "1"])
+    
     df = load_realtime(feed_group)
 
     route_filter = st.multiselect("Route", sorted(df["route_id"].unique()), default=None)
     if route_filter:
         df = df[df["route_id"].isin(route_filter)]
+        
+    direction_filter = st.multiselect("Direction", sorted(df["direction"].unique()), default=None)
+    if direction_filter:
+        df = df[df["direction"].isin(direction_filter)]
+        
+    # Display the data
 
     st.dataframe(df.head(50))
+    
+    # Show summary statistics
+    st.subheader("Summary Statistics")
+    st.write(f"Total trains: {df['train_id'].nunique()}")
+    st.write(f"Total stops: {df['stop_id'].nunique()}")

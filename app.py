@@ -3,13 +3,11 @@ import pandas as pds
 import tabs.tab1 as t1
 
 
-st.title("MTA Realtime Performance Dashboard")
+st.title("MTA Dashboard")
 
 tab1, tab2, tab3 = st.tabs(["Live Arrivals", "Line Performance", "Station Info"])
 
 with tab1:
-    st.subheader("Live Feed Data")
-    st.write("Show your realtime trains here...")
     t1.tab1()
 
 with tab2:
