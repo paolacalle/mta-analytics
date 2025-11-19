@@ -1,5 +1,8 @@
 # Add project dependencies here, one per line
-# Example:
-# requests==2.31.0
+# Need to be defined for deployment
 
-nyct_gtfs
+streamlit
+pandas
+plotly
+nyct-gtfs
+python-dateutil
