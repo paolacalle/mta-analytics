@@ -1,30 +1,21 @@
 import streamlit as st
-import pandas as pd
-from nyct_gtfs import NYCTFeed
+import pandas as pds
+import tabs.tab1 as t1
 
-@st.cache_data(ttl=30)  # re-fetch every 30 seconds
-def load_realtime(feed_group: str) -> pd.DataFrame:
-    feed = NYCTFeed(feed_group)
-    rows = []
-    for train in feed.trips:
-        for stu in train.stop_time_updates:
-            rows.append({
-                "route_id": train.route_id,
-                "direction": train.direction,
-                "train_id": train.trip_id,
-                "stop_id": stu.stop_id,
-                "stop_name": stu.stop_name,
-                "arrival_time": stu.arrival,
-            })
-    return pd.DataFrame(rows)
 
-st.title("MTA Realtime Subway Dashboard")
+st.title("MTA Realtime Performance Dashboard")
 
-feed_group = st.selectbox("Feed group", ["A", "B", "N", "1"])
-df = load_realtime(feed_group)
+tab1, tab2, tab3 = st.tabs(["Live Arrivals", "Line Performance", "Station Info"])
 
-route_filter = st.multiselect("Route", sorted(df["route_id"].unique()), default=None)
-if route_filter:
-    df = df[df["route_id"].isin(route_filter)]
+with tab1:
+    st.subheader("Live Feed Data")
+    st.write("Show your realtime trains here...")
+    t1.tab1()
 
-st.dataframe(df.head(50))
+with tab2:
+    st.subheader("On-Time Performance")
+    st.write("Plot your KPIs here...")
+
+with tab3:
+    st.subheader("Station Map / Details")
+    st.write("Maps, stop listings, etc...")
