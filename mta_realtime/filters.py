@@ -7,10 +7,10 @@ import streamlit as st
 
 from .config import FEED_GROUPS
 from .data import load_realtime, normalize_arrival_times, normalize_departure_times
-
+ 
 
 @st.cache_data(ttl=30)
-def _load_and_prepare(feed_key: str) -> pd.DataFrame:
+def _load_and_prepare_realtime(feed_key: str) -> pd.DataFrame:
     df = load_realtime(feed_key)
     if df.empty:
         return df
@@ -18,8 +18,12 @@ def _load_and_prepare(feed_key: str) -> pd.DataFrame:
     df = normalize_departure_times(df)
     return df
 
+# @st.cache_data(ttl=30)
+# def _load_and_prepare_trip_shapes(feed_key: str) -> pd.DataFrame:
+#     df = load_trip_shapes(feed_key)
+#     return df
 
-def sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
+def p1_sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
     """
     Renders the sidebar:
       - feed group selector
@@ -41,7 +45,7 @@ def sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
     )
 
     with st.spinner("Fetching realtime data from MTA..."):
-        df = _load_and_prepare(feed_key)
+        df = _load_and_prepare_realtime(feed_key)
 
     if df.empty:
         st.warning("No realtime data returned for this feed at the moment.")
@@ -115,6 +119,33 @@ def filter_train_id_route(
     ].copy()
     
     return df_filtered, selected_train_id, selected_route_id
+    
+    
+def p2_sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
+    """
+    Renders the sidebar for Page 2:
+      - feed group selector
+      - time window slider (minutes from first arrival)
+      - route multi-select
+    Returns:
+        feed_key, df_filtered, lower_min, upper_min
+    """
+    
+    
+    # filter by train_id and route_id
+    st.header("Feed & Filters")
+    feed_label = st.selectbox("Feed group", list(FEED_GROUPS.keys()))
+    feed_key = FEED_GROUPS[feed_label]
+    st.caption(
+        "Each feed group bundles several lines together, "
+        "matching how MTA serves GTFS-Realtime data."
+    )
+    # with st.spinner("Fetching realtime data from MTA..."):
+    #     df = _load_and_prepare_trip_shapes(feed_key)
+        
+    # if df.empty:
+    #     st.warning("No realtime data returned for this feed at the moment.")
+    #     return feed_key, df, 0, 0
     
     
     

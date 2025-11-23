@@ -1,7 +1,7 @@
 # pages/1_Live_Arrivals.py
 import streamlit as st
 
-from mta_realtime.filters import sidebar_controls
+from mta_realtime.filters import p1_sidebar_controls
 from mta_realtime.layout import (
     render_top_section, 
     render_stop_direction_filters, 
@@ -24,7 +24,7 @@ to inspect upcoming trains and their stops.
 
 # Sidebar: feed, routes, time window → returns filtered dataframe
 with st.sidebar:
-    feed_key, df_filtered, lower_min, upper_min = sidebar_controls()
+    feed_key, df_filtered, lower_min, upper_min = p1_sidebar_controls()
 
 if df_filtered.empty:
     st.warning("No arrivals to display for the selected filters.")

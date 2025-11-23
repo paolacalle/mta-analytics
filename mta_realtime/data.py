@@ -3,6 +3,34 @@
 from typing import Dict
 import pandas as pd
 from nyct_gtfs import NYCTFeed
+from nyct_gtfs.gtfs_static_types import TripShapes
+
+def load_trip_shapes(feed_key: str) -> Dict[str, pd.DataFrame]:
+    """
+    Load static trip shapes for NYC Subway from nyct-gtfs.
+    Returns a dictionary mapping route_id to DataFrame of shape points.
+    """
+    feed = NYCTFeed(feed_key) 
+    trips = feed.trips
+
+    route_shapes: Dict[str, pd.DataFrame] = {}
+
+    for trip in trips:
+        route_id = trip.route_id
+        shape = trip._tripe_shapes
+        
+        df_shape = pd.DataFrame(
+            {
+                "route_id": route_id,
+                "shape_id": shape.shape_id,
+                "shape_pt_lat": [pt.lat for pt in shape.shape_points],
+                "shape_pt_lon": [pt.lon for pt in shape.shape_points],
+                "shape_pt_sequence": [pt.sequence for pt in shape.shape_points],
+            }
+        ).sort_values("shape_pt_sequence")
+        route_shapes[route_id] = df_shape
+
+    return route_shapes
 
 
 def load_realtime(feed_key: str) -> pd.DataFrame:
@@ -25,6 +53,7 @@ def load_realtime(feed_key: str) -> pd.DataFrame:
                     "arrival_time": stu.arrival,  # datetime
                     "status": train.location_status,
                     "departure_time": stu.departure,  # datetime
+                    "has_delay" : train.has_delay_alert
                 }
             )
 
@@ -38,6 +67,8 @@ def load_realtime(feed_key: str) -> pd.DataFrame:
                 "stop_name",
                 "arrival_time",
                 "status",
+                "departure_time",
+                "has_delay"
             ]
         )
 

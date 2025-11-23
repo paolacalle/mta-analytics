@@ -26,8 +26,10 @@ def render_top_section(df_filtered: pd.DataFrame, feed_key: str) -> None:
                     "train_id",
                     "stop_name",
                     "arrival_time",
+                    "departure_time",
                     "diff_from_first_minutes",
                     "status",
+                    "has_delay"
                 ]
             ]
             .sort_values("arrival_time")
@@ -202,5 +204,17 @@ def render_follow_train_id_route(
         marker=dict(symbol="circle", size=10, color="blue"),
     )
     
+    # add legend explanation
+    fig.update_layout(
+        legend_title_text='Markers',
+        legend=dict(
+            itemsizing='constant',
+            traceorder='normal',
+        )
+    )
+
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Filter out the difference between arrival and departure times
+    
 
