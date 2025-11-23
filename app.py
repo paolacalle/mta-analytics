@@ -1,19 +1,27 @@
+# app.py
 import streamlit as st
-import pandas as pds
-import tabs.tab1 as t1
+from PIL import Image 
 
+MTA_LOGO = Image.open("assets/mta_logo.png")
+st.set_page_config(
+    page_title="MTA Realtime Performance Dashboard",
+    page_icon=MTA_LOGO,
+    layout="wide",
+)
 
-st.title("MTA Dashboard")
+st.title("MTA Realtime Performance Dashboard")
+st.markdown("""
+            
+This app explores **NYC Subway realtime data** using the MTA GTFS-Realtime API.
 
-tab1, tab2, tab3 = st.tabs(["Live Arrivals", "Line Performance", "Station Info"])
+Use the pages in the sidebar to:
+- **Live Arrivals** – view current train predictions by feed group and route.
+- **On-Time Performance** – analyze delays and on-time metrics (from processed data).
+- **oStation Summary** – look at aggregated stats by station.
 
-with tab1:
-    t1.tab1()
-
-with tab2:
-    st.subheader("On-Time Performance")
-    st.write("Plot your KPIs here...")
-
-with tab3:
-    st.subheader("Station Map / Details")
-    st.write("Maps, stop listings, etc...")
+### Tech stack
+- **Python**, **Streamlit**
+- **nyct-gtfs** for GTFS-Realtime API access
+- **Pandas**, **Plotly** for data processing and visualization
+- Hosted on **Streamlit Cloud**
+""")
