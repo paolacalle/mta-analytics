@@ -6,7 +6,13 @@ import pandas as pd
 import streamlit as st
 
 from .config import FEED_GROUPS
-from .data import load_ridership, load_realtime, normalize_arrival_times, normalize_departure_times
+from .data import (
+    load_ridership, 
+    load_realtime, 
+    normalize_arrival_times, 
+    normalize_departure_times,
+    load_felonies 
+)
  
 
 @st.cache_data(ttl=30)
@@ -33,6 +39,11 @@ def _load_and_prepare_ridership() -> pd.DataFrame:
 # def _load_and_prepare_trip_shapes(feed_key: str) -> pd.DataFrame:
 #     df = load_trip_shapes(feed_key)
 #     return df
+
+@st.cache_data(ttl=30)
+def _load_and_prepare_felonies() -> pd.DataFrame:
+    df = load_felonies()
+    return df
 
 def p1_sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
     """
@@ -186,5 +197,25 @@ def p3_sidebar_controls() -> pd.DataFrame:
         st.warning("No ridership data available at the moment.")
     return df_ridership
     
+    
+def p4_sidebar_controls() -> pd.DataFrame:
+    """
+    Renders the sidebar for Page 4:
+      - felonies data loader
+    Returns:
+        df_felonies 
+    """ 
+    
+    st.header("Major Felonies Data")
+    with st.spinner("Loading major felonies data..."):
+        df_felonies = _load_and_prepare_felonies()
+    if df_felonies.empty:
+        st.warning("No major felonies data available at the moment.")
+        
+    df_ridership = _load_and_prepare_ridership()
+    if df_ridership.empty:
+        st.warning("No ridership data available at the moment.")
+    return df_felonies, df_ridership
+
     
     

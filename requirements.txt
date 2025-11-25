@@ -8,3 +8,4 @@ nyct-gtfs
 python-dateutil
 scikit-learn
 numpy
+statsmodels

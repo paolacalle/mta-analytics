@@ -111,9 +111,6 @@ def normalize_departure_times(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-import pathlib
-import pandas as pd
-
 def load_ridership() -> pd.DataFrame:
     # Column index → clean column name
     cols = {
@@ -169,4 +166,32 @@ def load_ridership() -> pd.DataFrame:
     print("Loaded ridership data with columns:", df.columns.tolist())
     print("Date range:", df["date"].min(), "→", df["date"].max())
 
+    return df
+
+
+def load_felonies() -> pd.DataFrame:
+    data_path = pathlib.Path(__file__).parent.parent / "data" / "mta_major_felonies.csv"
+    
+    cols = {
+        0: "month",
+        1: "agency",
+        2: "police_force",
+        3: "felony_type",
+        4: "felony_count",
+        5: "crimes_per_100k_ridership"
+    }
+    df = pd.read_csv(
+        data_path,
+        usecols=cols.keys(),
+    )
+    
+    df.columns = list(cols.values())
+    df["month"] = pd.to_datetime(df["month"], format="%m/%d/%Y")
+    
+    # numeric columns
+    num_cols = ["felony_count", "crimes_per_100k_ridership"]
+    df[num_cols] = df[num_cols].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    
     return df
