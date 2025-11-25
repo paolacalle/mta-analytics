@@ -11,6 +11,9 @@ st.set_page_config(
 
 st.title("MTA Ridership & Safety Analytics Dashboard")
 
+# display icon
+st.image(MTA_LOGO, width=100)
+
 st.markdown("""
 This app explores **MTA ridership and safety patterns** using open data from the MTA
 (open data portal) starting in 2020.
