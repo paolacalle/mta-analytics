@@ -24,7 +24,7 @@ def _load_and_prepare_realtime(feed_key: str) -> pd.DataFrame:
 #     df = load_ridership()
 #     return df
 
-@st.cache_data(ttl=1)
+@st.cache_data(ttl=30)
 def _load_and_prepare_ridership() -> pd.DataFrame:
     df = load_ridership()
     return df
