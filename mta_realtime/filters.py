@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from .config import FEED_GROUPS
-from .data import load_realtime, normalize_arrival_times, normalize_departure_times
+from .data import load_ridership, load_realtime, normalize_arrival_times, normalize_departure_times
  
 
 @st.cache_data(ttl=30)
@@ -16,6 +16,17 @@ def _load_and_prepare_realtime(feed_key: str) -> pd.DataFrame:
         return df
     df = normalize_arrival_times(df)
     df = normalize_departure_times(df)
+    df = calculate_predicted_delays(df)
+    return df
+
+# @st.cache_data(ttl=30)
+# def _load_and_prepare_trip_shapes() -> pd.DataFrame:
+#     df = load_ridership()
+#     return df
+
+@st.cache_data(ttl=1)
+def _load_and_prepare_ridership() -> pd.DataFrame:
+    df = load_ridership()
     return df
 
 # @st.cache_data(ttl=30)
@@ -121,6 +132,19 @@ def filter_train_id_route(
     return df_filtered, selected_train_id, selected_route_id
     
     
+def calculate_predicted_delays(
+    df: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Calculates predicted delays for each stop based on arrival and departure times.
+    Adds a 'predicted_delay_minutes' column to the dataframe.
+    """
+    df = df.copy()
+    df["predicted_delay_minutes"] = (
+        (df["arrival_time"] - df["departure_time"]).dt.total_seconds() / 60.0
+    )
+    return df
+    
 def p2_sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
     """
     Renders the sidebar for Page 2:
@@ -147,7 +171,20 @@ def p2_sidebar_controls() -> Tuple[str, pd.DataFrame, int, int]:
     #     st.warning("No realtime data returned for this feed at the moment.")
     #     return feed_key, df, 0, 0
     
+def p3_sidebar_controls() -> pd.DataFrame:
+    """
+    Renders the sidebar for Page 3:
+      - ridership data loader
+    Returns:
+        df_ridership 
+    """
     
+    st.header("Ridership Data")
+    with st.spinner("Loading ridership data..."):
+        df_ridership = _load_and_prepare_ridership()
+    if df_ridership.empty:
+        st.warning("No ridership data available at the moment.")
+    return df_ridership
     
     
     

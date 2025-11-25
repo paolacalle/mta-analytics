@@ -4,6 +4,7 @@ from typing import Dict
 import pandas as pd
 from nyct_gtfs import NYCTFeed
 from nyct_gtfs.gtfs_static_types import TripShapes
+import pathlib
 
 def load_trip_shapes(feed_key: str) -> Dict[str, pd.DataFrame]:
     """
@@ -51,9 +52,12 @@ def load_realtime(feed_key: str) -> pd.DataFrame:
                     "stop_id": stu.stop_id,
                     "stop_name": stu.stop_name,
                     "arrival_time": stu.arrival,  # datetime
+                    "scheduled_track": stu.scheduled_track,
+                    "actual_track": stu.actual_track,
                     "status": train.location_status,
                     "departure_time": stu.departure,  # datetime
-                    "has_delay" : train.has_delay_alert
+                    "has_delay" : train.has_delay_alert,
+                    "last_position_update": train.last_position_update
                 }
             )
 
@@ -68,7 +72,10 @@ def load_realtime(feed_key: str) -> pd.DataFrame:
                 "arrival_time",
                 "status",
                 "departure_time",
-                "has_delay"
+                "has_delay",
+                "last_position_update",
+                "scheduled_track",
+                "actual_track",
             ]
         )
 
@@ -101,5 +108,65 @@ def normalize_departure_times(df: pd.DataFrame) -> pd.DataFrame:
 
     df["departure_time"] = pd.to_datetime(df["departure_time"], utc=True)
     df["departure_time"] = df["departure_time"].dt.tz_convert("America/New_York")
+
+    return df
+
+import pathlib
+import pandas as pd
+
+def load_ridership() -> pd.DataFrame:
+    # Column index → clean column name
+    cols = {
+        0:  "date",
+
+        1:  "subway_total_estimated_ridership",
+        2:  "subway_pct_of_prepandemic_day",
+
+        3:  "bus_total_estimated_ridership",
+        4:  "bus_pct_of_prepandemic_day",
+
+        5:  "lirr_total_estimated_ridership",
+        6:  "lirr_pct_of_prepandemic_day",
+
+        7:  "metro_north_total_estimated_ridership",
+        8:  "metro_north_pct_of_prepandemic_day",
+
+        9:  "access_a_ride_total_scheduled_trips",
+        10: "access_a_ride_pct_of_prepandemic_day",
+
+        11: "bridges_tunnels_total_traffic",
+        12: "bridges_tunnels_pct_of_prepandemic_day",
+
+        13: "sirr_total_estimated_ridership",
+        14: "sirr_pct_of_prepandemic_day",
+    }
+
+    data_path = pathlib.Path(__file__).parent.parent / "data" / "daily_ridership.csv"
+
+    # 1) Load only the columns we care about, by index
+    df = pd.read_csv(
+        data_path,
+        usecols=cols.keys(),   # 0–14
+    )
+
+    # 2) Rename columns based on position --> clean names
+    df.columns = list(cols.values())
+
+    # 3) Parse date column
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+    # 4) Convert all non-date columns to numeric
+    num_cols = [c for c in df.columns if c != "date"]
+    df[num_cols] = df[num_cols].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    
+    # convert date column to datetime if not already
+    if not pd.api.types.is_datetime64_any_dtype(df["date"]):
+        df["date"] = pd.to_datetime(df["date"])
+
+    # debug
+    print("Loaded ridership data with columns:", df.columns.tolist())
+    print("Date range:", df["date"].min(), "→", df["date"].max())
 
     return df

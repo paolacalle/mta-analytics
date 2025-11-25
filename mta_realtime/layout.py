@@ -27,9 +27,13 @@ def render_top_section(df_filtered: pd.DataFrame, feed_key: str) -> None:
                     "stop_name",
                     "arrival_time",
                     "departure_time",
+                    "predicted_delay_minutes",
                     "diff_from_first_minutes",
                     "status",
-                    "has_delay"
+                    "has_delay",
+                    # "last_position_update",
+                    "scheduled_track",
+                    "actual_track",
                 ]
             ]
             .sort_values("arrival_time")
