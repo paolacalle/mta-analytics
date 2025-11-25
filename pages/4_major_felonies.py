@@ -1,3 +1,4 @@
+from tkinter import Image
 import streamlit as st
 
 from mta_realtime.filters import p4_sidebar_controls
@@ -10,7 +11,8 @@ from mta_realtime.layout_felonies import (
     render_crime_vs_ridership
 )
 
-
+MTA_LOGO = Image.open("../assets/mta_logo.png")
+st.set_page_config(page_title="Major Felonies", page_icon=MTA_LOGO, layout="wide")
 st.title("Major Felony Incidents Near Subway Stations")
 
 st.markdown(

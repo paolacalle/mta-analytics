@@ -1,6 +1,6 @@
 # pages/1_Live_Arrivals.py
 import streamlit as st
-
+from PIL import Image 
 from mta_realtime.filters import p3_sidebar_controls
 from mta_realtime.layout_ridership import (
     render_eda_table,
@@ -17,7 +17,8 @@ from mta_realtime.layout_ridership import (
     render_mode_correlations
 )
 
-st.set_page_config(page_title="Ridership", page_icon="", layout="wide")
+MTA_LOGO = Image.open("../assets/mta_logo.png")
+st.set_page_config(page_title="Ridership", page_icon=MTA_LOGO, layout="wide")
 
 st.title("Subway Ridership Over Time")
 
